@@ -1,0 +1,6 @@
+{
+  "port": 3610,
+  "winston": {
+    "level": "debug"
+  }
+}
