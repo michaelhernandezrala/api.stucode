@@ -45,5 +45,12 @@ export default [
       ...nodeRules,
     },
   },
+  {
+    files: ['src/lib/sequelize/**/*.js'],
+    rules: {
+      ...Object.keys(jsdocRules).reduce((acc, rule) => ({ ...acc, [rule]: 'off' }), {}),
+      ...Object.keys(nodeRules).reduce((acc, rule) => ({ ...acc, [rule]: 'off' }), {}),
+    },
+  },
   pluginJs.configs.recommended,
 ];

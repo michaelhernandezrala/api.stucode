@@ -1,6 +1,5 @@
 const convict = require('convict');
 const dotenv = require('dotenv');
-const path = require('path');
 
 dotenv.config();
 
@@ -25,11 +24,39 @@ const config = convict({
       env: 'LOG_LEVEL',
     },
   },
+  database: {
+    username: {
+      doc: 'Database username',
+      format: String,
+      default: '',
+      env: 'DB_USER',
+    },
+    password: {
+      doc: 'Database password',
+      format: String,
+      default: '',
+      env: 'DB_PASSWORD',
+      sensitive: true,
+    },
+    database: {
+      doc: 'Database name',
+      format: String,
+      default: '',
+      env: 'DB_NAME',
+    },
+    host: {
+      doc: 'Database host',
+      format: String,
+      default: '127.0.0.1',
+      env: 'DB_HOST',
+    },
+    dialect: {
+      doc: 'Database dialect (e.g., postgres, mysql)',
+      format: ['postgres', 'mysql', 'sqlite', 'mariadb', 'mssql'],
+      default: 'postgres',
+      env: 'DB_DIALECT',
+    },
+  },
 });
-
-const env = config.get('env');
-config.loadFile(path.join(__dirname, './' + env + '.json'));
-
-config.validate({ allowed: 'strict' });
 
 module.exports = config;
