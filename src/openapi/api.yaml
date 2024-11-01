@@ -289,6 +289,34 @@ paths:
           $ref: '#/components/responses/NotFound'
         500:
           $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - Users 👤
+      summary: Delete a user by ID
+      description: This endpoint deletes a user specified.
+      x-eov-operation-handler: userController
+      operationId: deleteById
+      parameters:
+        - name: userId
+          in: path
+          description: The unique identifier of the user to be deleted.
+          required: true
+          schema:
+            type: string
+            example: 550e8400-e29b-41d4-a716-446655440000
+      responses:
+        204:
+          description: User successfully deleted
+        400:
+          $ref: '#/components/responses/BadRequest'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/InternalServerError'
 
 components:
   securitySchemes:

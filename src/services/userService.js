@@ -81,4 +81,14 @@ const update = async (id, data, params = null) => {
   return response[1][0];
 };
 
-module.exports = { create, findById, findByEmail, findAndCountAll, update };
+/**
+ * Deletes a user from the database by id.
+ *
+ * @param {string} id - The id of the user to be deleted.
+ * @returns {Promise<boolean>} A promise that resolves to a boolean indicating the success of the deletion.
+ */
+const deleteById = async (id) => {
+  await User.destroy({ where: { id } });
+};
+
+module.exports = { create, findById, findByEmail, findAndCountAll, update, deleteById };
