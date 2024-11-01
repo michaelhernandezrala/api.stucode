@@ -16,6 +16,17 @@ const create = async (data) => {
 };
 
 /**
+ * Retrieves a user by id from the database.
+ *
+ * @param {string} id - The id of the user to be retrieved.
+ * @param {object} [params=null] - Additional options for the query.
+ * @returns {Promise<object|null>} The user object if found, or null if not.
+ */
+const findById = async (id, params = null) => {
+  return User.findOne({ where: { id }, ...params });
+};
+
+/**
  * Retrieves a user by email from the database.
  *
  * @param {string} email - The email of the user to be retrieved.
@@ -57,4 +68,4 @@ const findAndCountAll = async (filters, params = null) => {
   });
 };
 
-module.exports = { create, findByEmail, findAndCountAll };
+module.exports = { create, findById, findByEmail, findAndCountAll };

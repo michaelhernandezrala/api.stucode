@@ -49,7 +49,7 @@ const login = async (req, res) => {
 
   const user = await userService.findByEmail(payload.email, { raw: true });
   if (!user) {
-    responseHelper.conflict(req, res, errorMessages.USER_NOT_FOUND, errorCodes.USER_NOT_FOUND);
+    responseHelper.notFound(req, res, errorMessages.USER_NOT_FOUND, errorCodes.USER_NOT_FOUND);
     return;
   }
 
@@ -77,4 +77,22 @@ const findAndCountAll = async (req, res) => {
   responseHelper.ok(req, res, response.rows, response.count);
 };
 
-module.exports = { create, login, findAndCountAll };
+/**
+ * Handler for GET /users/{userId}
+ *
+ * @param {Request} req - The Express request object.
+ * @param {Response} res - The Express response object.
+ */
+const findById = async (req, res) => {
+  const { userId } = req.params;
+
+  const user = await userService.findById(userId, { raw: true });
+  if (!user) {
+    responseHelper.notFound(req, res, errorMessages.USER_NOT_FOUND, errorCodes.USER_NOT_FOUND);
+    return;
+  }
+
+  responseHelper.ok(req, res, user);
+};
+
+module.exports = { create, login, findAndCountAll, findById };
