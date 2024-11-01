@@ -9,6 +9,16 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         field: 'name',
       },
+      createdAt: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        field: 'created_at',
+      },
+      updatedAt: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        field: 'updated_at',
+      },
       email: {
         type: DataTypes.STRING,
         allowNull: false,

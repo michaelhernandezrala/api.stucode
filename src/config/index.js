@@ -24,6 +24,16 @@ const config = convict({
       env: 'LOG_LEVEL',
     },
   },
+  crypto: {
+    bcrypt: {
+      saltRound: {
+        doc: '',
+        format: '*',
+        default: 10,
+        env: 'SALT_ROUND',
+      },
+    },
+  },
   database: {
     username: {
       doc: 'Database username',
