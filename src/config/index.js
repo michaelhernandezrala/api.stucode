@@ -33,6 +33,20 @@ const config = convict({
         env: 'SALT_ROUND',
       },
     },
+    jwt: {
+      secret: {
+        doc: '',
+        format: '*',
+        default: 'cZ3LmqblLxIJNYwGtOZSpuNMt2wyYgu0',
+        env: 'JWT_SECRET',
+      },
+      expiresIn: {
+        doc: '',
+        format: '*',
+        default: '10min',
+        env: 'JWT_EXPIRES',
+      },
+    },
   },
   database: {
     username: {

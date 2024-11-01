@@ -17,7 +17,7 @@ paths:
       x-eov-operation-handler: userController
       operationId: create
       requestBody:
-        $ref: '#/components/requestBodies/PostRequestBody'
+        $ref: '#/components/requestBodies/PostRegisterRequestBody'
       responses:
         201:
           description: User successfully created
@@ -44,14 +44,50 @@ paths:
                   - data
         400:
           $ref: '#/components/responses/BadRequest'
-        401:
-          $ref: '#/components/responses/Unauthorized'
-        403:
-          $ref: '#/components/responses/Forbidden'
-        404:
-          $ref: '#/components/responses/NotFound'
         409:
           $ref: '#/components/responses/Conflict'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+
+  /users/login:
+    post:
+      tags:
+        - Users 👤
+      summary: Log in a user
+      description: This endpoint authenticates a user with the provided email and password, returning a JWT token if successful.
+      x-eov-operation-handler: userController
+      operationId: login
+      requestBody:
+        $ref: '#/components/requestBodies/PostLoginRequestBody'
+      responses:
+        200:
+          description: User successfully logged
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: integer
+                    format: int64
+                    description: HTTP status code indicating successful operation.
+                    default: 200
+                  message:
+                    type: string
+                    description: Descriptive message of the operation.
+                    default: OK
+                  data:
+                    description: JWT token used for authentication.
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                additionalProperties: false
+                required:
+                  - statusCode
+                  - message
+                  - data
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
         500:
           $ref: '#/components/responses/InternalServerError'
 
@@ -100,7 +136,7 @@ components:
         - email
         - biography
   requestBodies:
-    PostRequestBody:
+    PostRegisterRequestBody:
       required: true
       content:
         application/json:
@@ -125,6 +161,25 @@ components:
                 example: A software developer from California.
             required:
               - name
+              - email
+              - password
+            additionalProperties: false
+    PostLoginRequestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              email:
+                type: string
+                description: The email address of the user.
+                example: john.doe@example.com
+              password:
+                type: string
+                description: The password for the user account.
+                example: P@ssw0rd!
+            required:
               - email
               - password
             additionalProperties: false

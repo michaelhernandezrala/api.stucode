@@ -6,6 +6,7 @@ module.exports = {
   FORBIDDEN: 'FORBIDDEN',
 
   NOT_FOUND: 'NOT_FOUND',
+  USER_NOT_FOUND: 'USER_NOT_FOUND',
 
   CONFLICT: 'CONFLICT',
 

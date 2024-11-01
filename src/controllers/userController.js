@@ -33,4 +33,35 @@ const create = async (req, res) => {
   responseHelper.created(req, res, response);
 };
 
-module.exports = { create };
+/**
+ * Handler for POST /users/login
+ *
+ * @param {Request} req - The Express request object.
+ * @param {Response} res - The Express response object.
+ */
+const login = async (req, res) => {
+  let payload = req.body;
+
+  if (!validator.isEmail(payload.email)) {
+    responseHelper.badRequest(req, res, errorMessages.INVALID_EMAIL_FORMAT, errorCodes.BAD_REQUEST);
+    return;
+  }
+
+  const user = await userService.getByEmail(payload.email, { raw: true });
+  if (!user) {
+    responseHelper.conflict(req, res, errorMessages.USER_NOT_FOUND, errorCodes.USER_NOT_FOUND);
+    return;
+  }
+
+  const isPasswordCorrect = await cryptoHelper.compare(payload.password, user.password);
+  if (!isPasswordCorrect) {
+    responseHelper.badRequest(req, res, errorMessages.CREDENTIALS_NOT_VALID, errorCodes.BAD_REQUEST);
+    return;
+  }
+
+  payload = _.omit(payload, 'password');
+  const data = cryptoHelper.generateToken(payload);
+  responseHelper.ok(req, res, data);
+};
+
+module.exports = { create, login };
