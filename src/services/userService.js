@@ -68,4 +68,17 @@ const findAndCountAll = async (filters, params = null) => {
   });
 };
 
-module.exports = { create, findById, findByEmail, findAndCountAll };
+/**
+ * Updates an existing user in the database.
+ *
+ * @param {string} id - The id of the user to be updated.
+ * @param {object} data - The new data for the user.
+ * @param {object} [params=null] - Additional options for the update process.
+ * @returns {Promise<object>} The updated user object.
+ */
+const update = async (id, data, params = null) => {
+  const response = await User.update(data, { where: { id }, ...params });
+  return response[1][0];
+};
+
+module.exports = { create, findById, findByEmail, findAndCountAll, update };

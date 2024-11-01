@@ -95,4 +95,24 @@ const findById = async (req, res) => {
   responseHelper.ok(req, res, user);
 };
 
-module.exports = { create, login, findAndCountAll, findById };
+/**
+ * Handler for PUT /users/{userId}
+ *
+ * @param {Request} req - The Express request object.
+ * @param {Response} res - The Express response object.
+ */
+const update = async (req, res) => {
+  const { userId } = req.params;
+  const payload = req.body;
+
+  const user = await userService.findById(userId, { raw: true });
+  if (!user) {
+    responseHelper.notFound(req, res, errorMessages.USER_NOT_FOUND, errorCodes.USER_NOT_FOUND);
+    return;
+  }
+
+  const response = await userService.update(userId, payload, { returning: true, raw: true });
+  responseHelper.ok(req, res, response);
+};
+
+module.exports = { create, login, findAndCountAll, findById, update };

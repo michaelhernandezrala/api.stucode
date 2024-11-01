@@ -238,6 +238,57 @@ paths:
           $ref: '#/components/responses/NotFound'
         500:
           $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - Users 👤
+      summary: Update a user
+      description: This endpoint updates the details of an existing user based on the provided user ID.
+      x-eov-operation-handler: userController
+      operationId: update
+      parameters:
+        - name: userId
+          in: path
+          description: The unique identifier of the user to update.
+          required: true
+          schema:
+            type: string
+            example: 550e8400-e29b-41d4-a716-446655440000
+      requestBody:
+        $ref: '#/components/requestBodies/PutUserRequestBody'
+      responses:
+        200:
+          description: User successfully updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: integer
+                    format: int64
+                    description: HTTP status code indicating successful operation.
+                    default: 200
+                  message:
+                    type: string
+                    description: Descriptive message of the operation.
+                    default: OK
+                  data:
+                    $ref: '#/components/schemas/User'
+                additionalProperties: false
+                required:
+                  - statusCode
+                  - message
+                  - data
+        400:
+          $ref: '#/components/responses/BadRequest'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/InternalServerError'
 
 components:
   securitySchemes:
@@ -335,6 +386,22 @@ components:
             required:
               - email
               - password
+            additionalProperties: false
+    PutUserRequestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+                description: The name of the user.
+                example: John Doe
+              biography:
+                type: string
+                description: A short biography of the user.
+                example: A software developer from California.
             additionalProperties: false
   responses:
     Ok:
