@@ -1,3 +1,6 @@
+const _ = require('lodash');
+const { Op } = require('sequelize');
+
 const { User } = require('../lib/sequelize/models');
 
 /**
@@ -19,8 +22,39 @@ const create = async (data) => {
  * @param {object} [params=null] - Additional options for the query.
  * @returns {Promise<object|null>} The user object if found, or null if not.
  */
-const getByEmail = async (email, params = null) => {
+const findByEmail = async (email, params = null) => {
   return User.findOne({ where: { email }, ...params });
 };
 
-module.exports = { create, getByEmail };
+/**
+ * Finds and counts all users based on provided filters.
+ * @param {object} filters - Filters for querying users.
+ * @param {object?} [params=null] - Additional parameters for the query.
+ * @returns {Promise<object>} A promise that resolves to an object containing the count of users and
+ * the paginated list of users.
+ */
+const findAndCountAll = async (filters, params = null) => {
+  const { page, limit, find, order } = filters;
+  let orderClause = [['name', 'ASC']];
+  const offset = page * limit;
+  const where = {};
+
+  if (!_.isNil(find)) {
+    where[Op.or] = [{ name: { [Op.iLike]: `%${find}%` } }, { email: { [Op.iLike]: `%${find}%` } }];
+  }
+
+  if (order === 'z-a') {
+    orderClause = [['name', 'DESC']];
+  }
+
+  return User.findAndCountAll({
+    where,
+    order: orderClause,
+    offset,
+    limit,
+    attributes: { exclude: ['password'] },
+    ...params,
+  });
+};
+
+module.exports = { create, findByEmail, findAndCountAll };

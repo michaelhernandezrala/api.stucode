@@ -21,7 +21,7 @@ const create = async (req, res) => {
     return;
   }
 
-  const user = await userService.getByEmail(payload.email, { raw: true });
+  const user = await userService.findByEmail(payload.email, { raw: true });
   if (user) {
     responseHelper.conflict(req, res, errorMessages.EMAIL_ALREADY_REGISTERED, errorCodes.CONFLICT);
     return;
@@ -47,7 +47,7 @@ const login = async (req, res) => {
     return;
   }
 
-  const user = await userService.getByEmail(payload.email, { raw: true });
+  const user = await userService.findByEmail(payload.email, { raw: true });
   if (!user) {
     responseHelper.conflict(req, res, errorMessages.USER_NOT_FOUND, errorCodes.USER_NOT_FOUND);
     return;
@@ -64,4 +64,17 @@ const login = async (req, res) => {
   responseHelper.ok(req, res, data);
 };
 
-module.exports = { create, login };
+/**
+ * Handler for GET /users
+ *
+ * @param {Request} req - The Express request object.
+ * @param {Response} res - The Express response object.
+ */
+const findAndCountAll = async (req, res) => {
+  const filters = req.query;
+
+  const response = await userService.findAndCountAll(filters, { raw: true });
+  responseHelper.ok(req, res, response.rows, response.count);
+};
+
+module.exports = { create, login, findAndCountAll };
