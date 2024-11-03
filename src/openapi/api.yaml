@@ -641,6 +641,66 @@ paths:
         500:
           $ref: '#/components/responses/InternalServerError'
 
+  /users/{userId}/articles/{articleId}/like:
+    post:
+      tags:
+        - Likes 👍
+      summary: Like an article
+      description: Allows a user to like a specific article.
+      x-eov-operation-handler: likeController
+      operationId: create
+      parameters:
+        - name: userId
+          in: path
+          description: The unique identifier of the user.
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+        - name: articleId
+          in: path
+          description: The unique identifier of the article.
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 7cb1d2a5-8c7b-4f3b-a545-2fd938c70c7f
+      responses:
+        201:
+          description: Like successfully created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: integer
+                    format: int64
+                    description: HTTP status code indicating successful operation.
+                    default: 201
+                  message:
+                    type: string
+                    description: Descriptive message of the operation.
+                    default: Created
+                  data:
+                    $ref: '#/components/schemas/Like'
+                additionalProperties: false
+                required:
+                  - statusCode
+                  - message
+                  - data
+        400:
+          $ref: '#/components/responses/BadRequest'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+
 components:
   securitySchemes:
     bearerAuth:
@@ -727,6 +787,41 @@ components:
         - title
         - content
         - userId
+        - createdAt
+        - updatedAt
+
+    Like:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier for the like.
+          example: '3fa85f64-5717-4562-b3fc-2c963f66afa6'
+        userId:
+          type: string
+          format: uuid
+          description: The unique identifier of the user who liked the article.
+          example: '3fa85f64-5717-4562-b3fc-2c963f66afa6'
+        articleId:
+          type: string
+          format: uuid
+          description: The unique identifier of the article that was liked.
+          example: '3fa85f64-5717-4562-b3fc-2c963f66afa6'
+        createdAt:
+          type: string
+          format: date-time
+          description: The timestamp when the like was created.
+          example: '2024-11-03T12:34:56Z'
+        updatedAt:
+          type: string
+          format: date-time
+          description: The timestamp when the like was last updated.
+          example: '2024-11-03T12:34:56Z'
+      required:
+        - id
+        - userId
+        - articleId
         - createdAt
         - updatedAt
 
