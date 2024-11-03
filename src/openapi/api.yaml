@@ -600,6 +600,47 @@ paths:
         500:
           $ref: '#/components/responses/InternalServerError'
 
+    delete:
+      tags:
+        - Articles 📰
+      summary: Delete a specific article for a specific user
+      description: |
+        This endpoint deletes an existing article based on the provided user ID and article ID.
+
+        If the article or user does not exist, an appropriate error message will be returned.
+      x-eov-operation-handler: articleController
+      operationId: deleteByUserIdAndArticleId
+      parameters:
+        - name: userId
+          in: path
+          description: The unique identifier of the user.
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+        - name: articleId
+          in: path
+          description: The unique identifier of the article.
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 7cb1d2a5-8c7b-4f3b-a545-2fd938c70c7f
+      responses:
+        200:
+          $ref: '#/components/responses/Ok'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+
 components:
   securitySchemes:
     bearerAuth:

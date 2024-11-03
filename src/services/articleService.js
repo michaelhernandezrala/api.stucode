@@ -73,4 +73,14 @@ const update = async (filters, data, params = null) => {
   return response[1][0];
 };
 
-module.exports = { create, findById, findAndCountAll, update };
+/**
+ * Deletes a user from the database by its user owner and id.
+ *
+ * @param {object} filters - The filters of the article to be deleted.
+ * @returns {Promise<boolean>} A promise that resolves to a boolean indicating the success of the deletion.
+ */
+const deleteByUserIdAndArticleId = async (filters) => {
+  await Article.destroy({ where: { ...filters } });
+};
+
+module.exports = { create, findById, findAndCountAll, update, deleteByUserIdAndArticleId };

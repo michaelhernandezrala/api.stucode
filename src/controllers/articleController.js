@@ -89,4 +89,36 @@ const updateByUserIdAndArticleId = async (req, res) => {
   responseHelper.ok(req, res, response);
 };
 
-module.exports = { create, findAndCountAll, findByUserIdAndArticleId, updateByUserIdAndArticleId };
+/**
+ * Handler for DELETE /users/{userId}/articles/{articleId}
+ *
+ * @param {Request} req - The Express request object.
+ * @param {Response} res - The Express response object.
+ */
+const deleteByUserIdAndArticleId = async (req, res) => {
+  const { userId, articleId } = req.params;
+
+  const user = await userService.findById(userId, { raw: true });
+  if (!user) {
+    responseHelper.notFound(req, res, errorMessages.USER_NOT_FOUND, errorCodes.USER_NOT_FOUND);
+    return;
+  }
+
+  const article = await articleService.findById(articleId, { raw: true });
+  if (!article) {
+    responseHelper.notFound(req, res, errorMessages.ARTICLE_NOT_FOUND, errorCodes.ARTICLE_NOT_FOUND);
+    return;
+  }
+
+  const filters = { userId, id: articleId };
+  await articleService.deleteByUserIdAndArticleId(filters);
+  responseHelper.ok(req, res);
+};
+
+module.exports = {
+  create,
+  findAndCountAll,
+  findByUserIdAndArticleId,
+  updateByUserIdAndArticleId,
+  deleteByUserIdAndArticleId,
+};
