@@ -16,6 +16,17 @@ const create = async (data) => {
 };
 
 /**
+ * Retrieves an article by id from the database.
+ *
+ * @param {string} id - The id of the article to be retrieved.
+ * @param {object} [params=null] - Additional options for the query.
+ * @returns {Promise<object|null>} The article object if found, or null if not.
+ */
+const findById = async (id, params = null) => {
+  return Article.findOne({ where: { id }, ...params });
+};
+
+/**
  * Finds and counts all articles based on provided filters.
  * @param {object} filters - Filters for querying articles.
  * @param {object?} [params=null] - Additional parameters for the query.
@@ -49,4 +60,4 @@ const findAndCountAll = async (filters, params = null) => {
   });
 };
 
-module.exports = { create, findAndCountAll };
+module.exports = { create, findById, findAndCountAll };

@@ -38,4 +38,28 @@ const findAndCountAll = async (req, res) => {
   responseHelper.ok(req, res, response.rows, response.count);
 };
 
-module.exports = { create, findAndCountAll };
+/**
+ * Handler for GET /users/{userId}/articles/{articleId}
+ *
+ * @param {Request} req - The Express request object.
+ * @param {Response} res - The Express response object.
+ */
+const findByUserIdAndArticleId = async (req, res) => {
+  const { userId, articleId } = req.params;
+
+  const user = await userService.findById(userId, { raw: true });
+  if (!user) {
+    responseHelper.notFound(req, res, errorMessages.USER_NOT_FOUND, errorCodes.USER_NOT_FOUND);
+    return;
+  }
+
+  const article = await articleService.findById(articleId, { raw: true });
+  if (!article) {
+    responseHelper.notFound(req, res, errorMessages.ARTICLE_NOT_FOUND, errorCodes.ARTICLE_NOT_FOUND);
+    return;
+  }
+
+  responseHelper.ok(req, res, article);
+};
+
+module.exports = { create, findAndCountAll, findByUserIdAndArticleId };
