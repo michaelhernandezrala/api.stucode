@@ -535,6 +535,70 @@ paths:
           $ref: '#/components/responses/NotFound'
         500:
           $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - Articles 📰
+      summary: Update a specific article for a specific user
+      description: |
+        This endpoint updates an existing article based on the provided user ID and article ID.
+        The request body should include the fields that need to be updated, such as the title, content, or image.
+
+        If the article or user does not exist, an appropriate error message will be returned.
+      x-eov-operation-handler: articleController
+      operationId: updateByUserIdAndArticleId
+      parameters:
+        - name: userId
+          in: path
+          description: The unique identifier of the user.
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+        - name: articleId
+          in: path
+          description: The unique identifier of the article.
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 7cb1d2a5-8c7b-4f3b-a545-2fd938c70c7f
+      requestBody:
+        $ref: '#/components/requestBodies/PutArticleRequestBody'
+      responses:
+        200:
+          description: Article successfully updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: integer
+                    format: int64
+                    description: HTTP status code indicating successful operation.
+                    default: 200
+                  message:
+                    type: string
+                    description: Descriptive message of the operation.
+                    default: Updated
+                  data:
+                    $ref: '#/components/schemas/Article'
+                additionalProperties: false
+                required:
+                  - statusCode
+                  - message
+                  - data
+        400:
+          $ref: '#/components/responses/BadRequest'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/InternalServerError'
 
 components:
   securitySchemes:
@@ -714,6 +778,27 @@ components:
             required:
               - title
               - content
+            additionalProperties: false
+
+    PutArticleRequestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              title:
+                type: string
+                description: The updated title of the article.
+                example: Updated Article Title
+              content:
+                type: string
+                description: The updated content of the article.
+                example: This is the updated content of the article.
+              image:
+                type: string
+                description: Optional updated image URL for the article.
+                example: https://example.com/updated-image.jpg
             additionalProperties: false
 
   responses:

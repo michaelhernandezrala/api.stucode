@@ -60,4 +60,17 @@ const findAndCountAll = async (filters, params = null) => {
   });
 };
 
-module.exports = { create, findById, findAndCountAll };
+/**
+ * Updates an existing article in the database.
+ *
+ * @param {object} filters - The filters of the article to be updated.
+ * @param {object} data - The new data for the article.
+ * @param {object} [params=null] - Additional options for the update process.
+ * @returns {Promise<object>} The updated article object.
+ */
+const update = async (filters, data, params = null) => {
+  const response = await Article.update(data, { where: { ...filters }, ...params });
+  return response[1][0];
+};
+
+module.exports = { create, findById, findAndCountAll, update };
