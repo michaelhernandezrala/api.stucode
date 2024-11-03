@@ -12,7 +12,8 @@ const errorCodes = require('../constants/errorCodes');
  * @param {Response} res - The Express response object.
  */
 const create = async (req, res) => {
-  const { userId, articleId } = req.params;
+  const { userId } = req.params;
+  const payload = req.body;
 
   const user = await userService.findById(userId, { raw: true });
   if (!user) {
@@ -20,13 +21,13 @@ const create = async (req, res) => {
     return;
   }
 
-  const article = await articleService.findById(articleId, { raw: true });
+  const article = await articleService.findById(payload.articleId, { raw: true });
   if (!article) {
     responseHelper.notFound(req, res, errorMessages.ARTICLE_NOT_FOUND, errorCodes.ARTICLE_NOT_FOUND);
     return;
   }
 
-  const filters = { userId, articleId };
+  const filters = { userId, articleId: payload.articleId };
   const response = await likeService.create(filters);
   responseHelper.ok(req, res, response);
 };

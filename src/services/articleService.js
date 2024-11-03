@@ -1,7 +1,7 @@
 const _ = require('lodash');
-const { Op } = require('sequelize');
+const { Op, Sequelize } = require('sequelize');
 
-const { Article } = require('../lib/sequelize/models');
+const { Article, Like } = require('../lib/sequelize/models');
 
 /**
  * Registers a new article in the database.
@@ -51,13 +51,34 @@ const findAndCountAll = async (filters, params = null) => {
     orderClause = [['title', 'DESC']];
   }
 
-  return Article.findAndCountAll({
+  const count = await Article.count({ where });
+
+  let articles = await Article.findAll({
     where,
     order: orderClause,
     offset,
     limit,
+    include: [
+      {
+        model: Like,
+        attributes: [],
+        required: false,
+      },
+    ],
+    attributes: {
+      include: [[Sequelize.fn('COUNT', Sequelize.col('Likes.id')), 'likes']],
+    },
+    group: ['Article.id'],
+    subQuery: false,
     ...params,
   });
+
+  articles = articles.map((article) => ({
+    ...article,
+    likes: parseInt(article.likes, 10) ?? 0,
+  }));
+
+  return { rows: articles, count };
 };
 
 /**

@@ -641,7 +641,7 @@ paths:
         500:
           $ref: '#/components/responses/InternalServerError'
 
-  /users/{userId}/articles/{articleId}/like:
+  /users/{userId}/likes:
     post:
       tags:
         - Likes 👍
@@ -658,14 +658,21 @@ paths:
             type: string
             format: uuid
             example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
-        - name: articleId
-          in: path
-          description: The unique identifier of the article.
-          required: true
-          schema:
-            type: string
-            format: uuid
-            example: 7cb1d2a5-8c7b-4f3b-a545-2fd938c70c7f
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                articleId:
+                  type: string
+                  format: uuid
+                  description: The unique identifier of the article to be liked.
+                  example: '7cb1d2a5-8c7b-4f3b-a545-2fd938c70c7f'
+              required:
+                - articleId
+              additionalProperties: false
       responses:
         201:
           description: Like successfully created
@@ -781,6 +788,10 @@ components:
           type: string
           format: date-time
           description: Timestamp when the article was last updated.
+        likes:
+          type: integer
+          description: Number of likes the article has received.
+          example: 10
       additionalProperties: false
       required:
         - id
@@ -789,6 +800,7 @@ components:
         - userId
         - createdAt
         - updatedAt
+        - likes
 
     Like:
       type: object
