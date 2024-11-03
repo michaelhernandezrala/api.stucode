@@ -28,14 +28,25 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: true,
         field: 'image',
       },
+      createdAt: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        field: 'created_at',
+      },
+      updatedAt: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        field: 'updated_at',
+      },
       userId: {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-          model: 'users',
+          model: 'User',
           key: 'id',
         },
         onDelete: 'CASCADE',
+        field: 'user_id',
       },
     },
     {
