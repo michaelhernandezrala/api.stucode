@@ -135,8 +135,8 @@ paths:
           description: >
             Order of the results:
 
-              - `a-z` - Order by firstname ascending. From A to Z
-              - `z-a` - Order by firstname descending. From Z to A
+              - `a-z` - Order by name ascending. From A to Z
+              - `z-a` - Order by name descending. From Z to A
           required: false
           schema:
             type: string
@@ -372,6 +372,103 @@ paths:
           $ref: '#/components/responses/NotFound'
         409:
           $ref: '#/components/responses/Conflict'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+
+  /users/articles:
+    get:
+      tags:
+        - Articles 📰
+      summary: Retrieve a list of articles
+      description: >
+        Fetches a paginated list of articles created in the platform. You can use filters like search terms,
+        pagination, and ordering to refine the results.
+      x-eov-operation-handler: articleController
+      operationId: findAndCountAll
+      parameters:
+        - name: userId
+          in: query
+          description: The unique identifier of the user.
+          required: false
+          schema:
+            type: string
+            example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+        - name: page
+          in: query
+          description: The page number for pagination.
+          required: false
+          schema:
+            type: integer
+            format: int64
+            default: 0
+        - name: limit
+          in: query
+          description: The limit of results per page.
+          required: false
+          schema:
+            type: integer
+            format: int64
+            default: 20
+        - name: find
+          in: query
+          description: A search term to filter results.
+          required: false
+          schema:
+            type: string
+            default: ''
+          allowReserved: true
+        - name: order
+          in: query
+          description: >
+            Order of the results:
+
+              - `a-z` - Order by title ascending. From A to Z
+              - `z-a` - Order by title descending. From Z to A
+          required: false
+          schema:
+            type: string
+            enum:
+              - a-z
+              - z-a
+            default: a-z
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: integer
+                    format: int64
+                    description: HTTP status code indicating a successful operation.
+                    default: 200
+                  message:
+                    type: string
+                    description: Descriptive message of the operation.
+                    default: OK
+                  count:
+                    type: integer
+                    format: int64
+                    description: The total number of articles found.
+                    default: 1
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Article'
+                required:
+                  - statusCode
+                  - message
+                  - count
+                  - data
+                additionalProperties: false
+        400:
+          $ref: '#/components/responses/BadRequest'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        403:
+          $ref: '#/components/responses/Forbidden'
         500:
           $ref: '#/components/responses/InternalServerError'
 

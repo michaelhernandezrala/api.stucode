@@ -25,4 +25,17 @@ const create = async (req, res) => {
   responseHelper.created(req, res, response);
 };
 
-module.exports = { create };
+/**
+ * Handler for GET /users/articles
+ *
+ * @param {Request} req - The Express request object.
+ * @param {Response} res - The Express response object.
+ */
+const findAndCountAll = async (req, res) => {
+  const filters = req.query;
+
+  const response = await articleService.findAndCountAll(filters, { raw: true });
+  responseHelper.ok(req, res, response.rows, response.count);
+};
+
+module.exports = { create, findAndCountAll };
