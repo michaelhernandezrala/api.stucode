@@ -9,6 +9,8 @@ tags:
     description: Endpoints for managing users, including user creation, retrieval, and updates.
   - name: Articles 📰
     description: Endpoints for managing articles, including article creation, retrieval, and updates.
+  - name: Likes 👍
+    description: Endpoints for managing likes.
 security:
   - bearerAuth: []
 paths:
@@ -697,6 +699,45 @@ paths:
                   - statusCode
                   - message
                   - data
+        400:
+          $ref: '#/components/responses/BadRequest'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+
+  /users/{userId}/likes/{likeId}:
+    delete:
+      tags:
+        - Likes 👍
+      summary: Remove a like from an article
+      description: Allows a user to remove their like from a specific article using the like ID.
+      x-eov-operation-handler: likeController
+      operationId: deleteById
+      parameters:
+        - name: userId
+          in: path
+          description: The unique identifier of the user.
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+        - name: likeId
+          in: path
+          description: The unique identifier of the like to be removed.
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: '7cb1d2a5-8c7b-4f3b-a545-2fd938c70c7f'
+      responses:
+        200:
+          $ref: '#/components/responses/Ok'
         400:
           $ref: '#/components/responses/BadRequest'
         401:

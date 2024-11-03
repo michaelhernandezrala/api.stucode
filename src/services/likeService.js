@@ -17,4 +17,14 @@ const create = async (filters) => {
   return created ? like.get({ plain: true }) : like;
 };
 
-module.exports = { create };
+/**
+ * Deletes a like from the database by id.
+ *
+ * @param {string} id - The id of the like to be deleted.
+ * @returns {Promise<boolean>} A promise that resolves to a boolean indicating the success of the deletion.
+ */
+const deleteById = async (id) => {
+  await Like.destroy({ where: { id } });
+};
+
+module.exports = { create, deleteById };
