@@ -22,7 +22,27 @@ const create = async (data) => {
  * @returns {Promise<object|null>} The article object if found, or null if not.
  */
 const findById = async (id, params = null) => {
-  return Article.findOne({ where: { id }, ...params });
+  const article = await Article.findOne({
+    where: { id },
+    include: [
+      {
+        model: Like,
+        attributes: [],
+        required: false,
+      },
+    ],
+    attributes: {
+      include: [[Sequelize.fn('COUNT', Sequelize.col('Likes.id')), 'likes']],
+    },
+    group: ['Article.id'],
+    subQuery: false,
+    ...params,
+  });
+
+  return {
+    ...article,
+    likes: parseInt(article.likes, 10) ?? 0,
+  };
 };
 
 /**
