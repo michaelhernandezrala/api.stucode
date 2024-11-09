@@ -1,4 +1,3 @@
-const _ = require('lodash');
 const { Op } = require('sequelize');
 
 const { User } = require('../lib/sequelize/models');
@@ -50,7 +49,7 @@ const findAndCountAll = async (filters, params = null) => {
   const offset = page * limit;
   const where = {};
 
-  if (!_.isNil(find)) {
+  if (find) {
     where[Op.or] = [{ name: { [Op.iLike]: `%${find}%` } }, { email: { [Op.iLike]: `%${find}%` } }];
   }
 

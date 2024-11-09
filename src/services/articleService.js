@@ -1,4 +1,3 @@
-const _ = require('lodash');
 const { Op, Sequelize } = require('sequelize');
 
 const { Article, Like } = require('../lib/sequelize/models');
@@ -43,7 +42,7 @@ const findAndCountAll = async (filters, params = null) => {
     where.userId = userId;
   }
 
-  if (!_.isNil(find)) {
+  if (find) {
     where[Op.or] = [{ title: { [Op.iLike]: `%${find}%` } }, { content: { [Op.iLike]: `%${find}%` } }];
   }
 
