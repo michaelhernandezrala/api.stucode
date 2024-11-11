@@ -1,3 +1,4 @@
+const _ = require('lodash');
 const { Op, Sequelize } = require('sequelize');
 
 const { Article, Like } = require('../lib/sequelize/models');
@@ -55,7 +56,7 @@ const findById = async (id, params = null) => {
 const findAndCountAll = async (filters, params = null) => {
   const { userId, page, limit, find, order } = filters;
   let orderClause = [['title', 'ASC']];
-  const offset = page * limit;
+  const offset = (page - 1) * limit;
   const where = {};
 
   if (userId) {
@@ -91,6 +92,10 @@ const findAndCountAll = async (filters, params = null) => {
     subQuery: false,
     ...params,
   });
+
+  if (_.isEmpty(articles)) {
+    return { rows: [], count: 0 };
+  }
 
   articles = articles.map((article) => ({
     ...article,

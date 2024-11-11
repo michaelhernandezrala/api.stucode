@@ -1,6 +1,7 @@
-const { Op } = require('sequelize');
+const _ = require('lodash');
+const { Op, Sequelize } = require('sequelize');
 
-const { User } = require('../lib/sequelize/models');
+const { Article, User } = require('../lib/sequelize/models');
 
 /**
  * Registers a new user in the database.
@@ -22,7 +23,28 @@ const create = async (data) => {
  * @returns {Promise<object|null>} The user object if found, or null if not.
  */
 const findById = async (id, params = null) => {
-  return User.findOne({ where: { id }, ...params });
+  const user = await User.findOne({
+    where: { id },
+    include: [
+      {
+        model: Article,
+        attributes: [],
+        required: false,
+      },
+    ],
+    attributes: {
+      exclude: ['password'],
+      include: [[Sequelize.fn('COUNT', Sequelize.col('Articles.id')), 'articles']],
+    },
+    group: ['User.id'],
+    subQuery: false,
+    ...params,
+  });
+
+  return {
+    ...user,
+    articles: parseInt(user.articles, 10) ?? 0,
+  };
 };
 
 /**
@@ -46,7 +68,7 @@ const findByEmail = async (email, params = null) => {
 const findAndCountAll = async (filters, params = null) => {
   const { page, limit, find, order } = filters;
   let orderClause = [['name', 'ASC']];
-  const offset = page * limit;
+  const offset = (page - 1) * limit;
   const where = {};
 
   if (find) {
@@ -57,14 +79,39 @@ const findAndCountAll = async (filters, params = null) => {
     orderClause = [['name', 'DESC']];
   }
 
-  return User.findAndCountAll({
+  const count = await User.count({ where });
+
+  let users = await User.findAll({
     where,
     order: orderClause,
     offset,
     limit,
-    attributes: { exclude: ['password'] },
+    include: [
+      {
+        model: Article,
+        attributes: [],
+        required: false,
+      },
+    ],
+    attributes: {
+      exclude: ['password'],
+      include: [[Sequelize.fn('COUNT', Sequelize.col('Articles.id')), 'articles']],
+    },
+    group: ['User.id'],
+    subQuery: false,
     ...params,
   });
+
+  if (_.isEmpty(users)) {
+    return { rows: [], count: 0 };
+  }
+
+  users = users.map((user) => ({
+    ...user,
+    articles: parseInt(user.articles, 10) ?? 0,
+  }));
+
+  return { rows: users, count };
 };
 
 /**

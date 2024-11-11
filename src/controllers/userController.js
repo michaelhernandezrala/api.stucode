@@ -40,14 +40,14 @@ const create = async (req, res) => {
  * @param {Response} res - The Express response object.
  */
 const login = async (req, res) => {
-  let payload = req.body;
+  const payload = req.body;
 
   if (!validator.isEmail(payload.email)) {
     responseHelper.badRequest(req, res, errorMessages.INVALID_EMAIL_FORMAT, errorCodes.BAD_REQUEST);
     return;
   }
 
-  const user = await userService.findByEmail(payload.email, { raw: true });
+  let user = await userService.findByEmail(payload.email, { raw: true });
   if (!user) {
     responseHelper.notFound(req, res, errorMessages.USER_NOT_FOUND, errorCodes.USER_NOT_FOUND);
     return;
@@ -59,8 +59,8 @@ const login = async (req, res) => {
     return;
   }
 
-  payload = _.omit(payload, 'password');
-  const data = cryptoHelper.generateToken(payload);
+  user = _.omit(user, 'password');
+  const data = cryptoHelper.generateToken(user);
   responseHelper.ok(req, res, data);
 };
 
