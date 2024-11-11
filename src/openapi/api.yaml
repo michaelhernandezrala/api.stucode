@@ -795,6 +795,10 @@ components:
           type: integer
           description: The number of the user's articles
           example: 10
+        favorites:
+          type: integer
+          description: The number of the user's favorite articles
+          example: 2
       additionalProperties: false
       required:
         - id
@@ -804,6 +808,7 @@ components:
         - email
         - biography
         - articles
+        - favorites
 
     Article:
       type: object

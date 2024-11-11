@@ -1,7 +1,7 @@
 const _ = require('lodash');
 const { Op, Sequelize } = require('sequelize');
 
-const { Article, User } = require('../lib/sequelize/models');
+const { Article, User, Like } = require('../lib/sequelize/models');
 
 /**
  * Registers a new user in the database.
@@ -31,10 +31,18 @@ const findById = async (id, params = null) => {
         attributes: [],
         required: false,
       },
+      {
+        model: Like,
+        attributes: [],
+        required: false,
+      },
     ],
     attributes: {
       exclude: ['password'],
-      include: [[Sequelize.fn('COUNT', Sequelize.col('Articles.id')), 'articles']],
+      include: [
+        [Sequelize.fn('COUNT', Sequelize.literal('DISTINCT "Likes"."article_id"')), 'favorites'],
+        [Sequelize.fn('COUNT', Sequelize.col('Articles.id')), 'articles'],
+      ],
     },
     group: ['User.id'],
     subQuery: false,
@@ -44,6 +52,7 @@ const findById = async (id, params = null) => {
   return {
     ...user,
     articles: parseInt(user.articles, 10) ?? 0,
+    favorites: parseInt(user.favorites, 10) ?? 0,
   };
 };
 
@@ -95,7 +104,10 @@ const findAndCountAll = async (filters, params = null) => {
     ],
     attributes: {
       exclude: ['password'],
-      include: [[Sequelize.fn('COUNT', Sequelize.col('Articles.id')), 'articles']],
+      include: [
+        [Sequelize.fn('COUNT', Sequelize.literal('DISTINCT "Likes"."article_id"')), 'favorites'],
+        [Sequelize.fn('COUNT', Sequelize.col('Articles.id')), 'articles'],
+      ],
     },
     group: ['User.id'],
     subQuery: false,
@@ -109,6 +121,7 @@ const findAndCountAll = async (filters, params = null) => {
   users = users.map((user) => ({
     ...user,
     articles: parseInt(user.articles, 10) ?? 0,
+    favorites: parseInt(user.favorites, 10) ?? 0,
   }));
 
   return { rows: users, count };
