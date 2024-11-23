@@ -33,13 +33,13 @@ const create = async (req, res) => {
 };
 
 /**
- * Handler for DELETE /users/{userId}/like/{likeId}
+ * Handler for GET /users/{userId}/favorites/{articleId}
  *
  * @param {Request} req - The Express request object.
  * @param {Response} res - The Express response object.
  */
-const deleteById = async (req, res) => {
-  const { userId, likeId } = req.params;
+const checkIfFavorite = async (req, res) => {
+  const { userId, articleId } = req.params;
 
   const user = await userService.findById(userId, { raw: true });
   if (!user) {
@@ -47,8 +47,27 @@ const deleteById = async (req, res) => {
     return;
   }
 
-  await likeService.deleteById(likeId);
+  const isFavorite = await likeService.checkIfLiked(userId, articleId);
+  responseHelper.ok(req, res, { isFavorite });
+};
+
+/**
+ * Handler for DELETE /users/{userId}/like/{likeId}
+ *
+ * @param {Request} req - The Express request object.
+ * @param {Response} res - The Express response object.
+ */
+const deleteById = async (req, res) => {
+  const { userId, articleId } = req.params;
+
+  const user = await userService.findById(userId, { raw: true });
+  if (!user) {
+    responseHelper.notFound(req, res, errorMessages.USER_NOT_FOUND, errorCodes.USER_NOT_FOUND);
+    return;
+  }
+
+  await likeService.deleteById(userId, articleId);
   responseHelper.ok(req, res);
 };
 
-module.exports = { create, deleteById };
+module.exports = { create, checkIfFavorite, deleteById };

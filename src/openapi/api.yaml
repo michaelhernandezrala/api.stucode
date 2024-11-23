@@ -643,6 +643,102 @@ paths:
         500:
           $ref: '#/components/responses/InternalServerError'
 
+  /users/{userId}/favorites:
+    get:
+      tags:
+        - Articles 📰
+      summary: Retrieve user's favorite articles
+      description: >
+        Retrieves a paginated list of articles that the specified user has marked as favorites.
+      x-eov-operation-handler: articleController
+      operationId: findFavoritesByUserId
+      parameters:
+        - name: userId
+          in: path
+          description: The unique identifier of the user.
+          required: true
+          schema:
+            type: string
+            example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+        - name: page
+          in: query
+          description: The page number for pagination.
+          required: false
+          schema:
+            type: integer
+            format: int64
+            default: 1
+        - name: limit
+          in: query
+          description: The limit of results per page.
+          required: false
+          schema:
+            type: integer
+            format: int64
+            default: 20
+        - name: find
+          in: query
+          description: A search term to filter results.
+          required: false
+          schema:
+            type: string
+            default: ''
+          allowReserved: true
+        - name: order
+          in: query
+          description: >
+            Order of the results:
+
+              - `a-z` - Order by title ascending. From A to Z
+              - `z-a` - Order by title descending. From Z to A
+          required: false
+          schema:
+            type: string
+            enum:
+              - a-z
+              - z-a
+            default: a-z
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: integer
+                    format: int64
+                    description: HTTP status code indicating a successful operation.
+                    default: 200
+                  message:
+                    type: string
+                    description: Descriptive message of the operation.
+                    default: OK
+                  count:
+                    type: integer
+                    format: int64
+                    description: The total number of articles found.
+                    default: 1
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Article'
+                required:
+                  - statusCode
+                  - message
+                  - count
+                  - data
+                additionalProperties: false
+        400:
+          $ref: '#/components/responses/BadRequest'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+
   /users/{userId}/likes:
     post:
       tags:
@@ -710,7 +806,53 @@ paths:
         500:
           $ref: '#/components/responses/InternalServerError'
 
-  /users/{userId}/likes/{likeId}:
+  /users/{userId}/likes/{articleId}:
+    get:
+      tags:
+        - Likes 👍
+      summary: Check if an article is marked as favorite
+      description: Verifies if a specific article is marked as favorite by the user.
+      x-eov-operation-handler: likeController
+      operationId: checkIfFavorite
+      parameters:
+        - name: userId
+          in: path
+          description: The unique identifier of the user.
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+        - name: articleId
+          in: path
+          description: The unique identifier of the article.
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: '7cb1d2a5-8c7b-4f3b-a545-2fd938c70c7f'
+      responses:
+        200:
+          description: The article favorite status for the user.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isFavorite:
+                    type: boolean
+                    description: Indicates if the article is marked as favorite.
+                    example: true
+        400:
+          $ref: '#/components/responses/BadRequest'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/InternalServerError'
     delete:
       tags:
         - Likes 👍
@@ -727,9 +869,9 @@ paths:
             type: string
             format: uuid
             example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
-        - name: likeId
+        - name: articleId
           in: path
-          description: The unique identifier of the like to be removed.
+          description: The unique identifier of the article.
           required: true
           schema:
             type: string

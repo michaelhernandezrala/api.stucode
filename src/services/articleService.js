@@ -115,7 +115,8 @@ const findAndCountAll = async (filters, params = null) => {
  */
 const update = async (filters, data, params = null) => {
   const response = await Article.update(data, { where: { ...filters }, ...params });
-  return response[1][0];
+  const id = response[1][0].id;
+  return findById(id, { raw: true });
 };
 
 /**
@@ -128,4 +129,65 @@ const deleteByUserIdAndArticleId = async (filters) => {
   await Article.destroy({ where: { ...filters } });
 };
 
-module.exports = { create, findById, findAndCountAll, update, deleteByUserIdAndArticleId };
+/**
+ * Finds and counts all favorite articles for a specific user based on provided filters.
+ *
+ * @async
+ * @function findAndCountAllFavorites
+ * @param {object} filters - The filtering options for retrieving favorite articles.
+ * @param {object?} [params=null] - Additional parameters for the query.
+ * @returns {Promise<object>} An object containing the count and rows of favorite articles.
+ */
+const findAndCountAllFavorites = async (filters, params = {}) => {
+  const { userId, page = 1, limit = 10, find, order } = filters;
+
+  const offset = (page - 1) * limit;
+  const orderClause = order === 'desc' ? [['title', 'DESC']] : [['title', 'ASC']];
+
+  const where = {};
+  if (find) {
+    where[Op.or] = [{ title: { [Op.iLike]: `%${find}%` } }, { content: { [Op.iLike]: `%${find}%` } }];
+  }
+
+  const { count, rows: articles } = await Article.findAndCountAll({
+    where,
+    include: [
+      {
+        model: Like,
+        attributes: [],
+        where: { userId },
+      },
+    ],
+    attributes: {
+      include: [
+        [
+          Sequelize.literal(`(
+            SELECT COUNT(*)
+            FROM likes AS l
+            WHERE l.article_id = "Article"."id"
+          )`),
+          'likesCount',
+        ],
+      ],
+    },
+    order: orderClause,
+    limit,
+    offset,
+    ...params,
+  });
+
+  const formattedArticles = articles.map((article) => ({
+    id: article.id,
+    title: article.title,
+    content: article.content,
+    image: article.image,
+    createdAt: article.createdAt,
+    updatedAt: article.updatedAt,
+    userId: article.userId,
+    likes: parseInt(article.likesCount, 10) || 0,
+  }));
+
+  return { rows: formattedArticles, count };
+};
+
+module.exports = { create, findById, findAndCountAll, update, deleteByUserIdAndArticleId, findAndCountAllFavorites };

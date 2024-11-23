@@ -101,6 +101,11 @@ const findAndCountAll = async (filters, params = null) => {
         attributes: [],
         required: false,
       },
+      {
+        model: Like,
+        attributes: [],
+        required: false,
+      },
     ],
     attributes: {
       exclude: ['password'],

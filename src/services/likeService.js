@@ -18,13 +18,26 @@ const create = async (filters) => {
 };
 
 /**
- * Deletes a like from the database by id.
+ * Checks if a user has liked a specific article.
  *
- * @param {string} id - The id of the like to be deleted.
- * @returns {Promise<boolean>} A promise that resolves to a boolean indicating the success of the deletion.
+ * @param {string} userId - The ID of the user.
+ * @param {string} articleId - The ID of the article.
+ * @returns {Promise<boolean>} A promise that resolves to `true` if the like exists, otherwise `false`.
  */
-const deleteById = async (id) => {
-  await Like.destroy({ where: { id } });
+const checkIfLiked = async (userId, articleId) => {
+  const like = await Like.findOne({ where: { userId, articleId }, raw: true });
+  return !!like;
 };
 
-module.exports = { create, deleteById };
+/**
+ * Deletes a like from the database by id.
+ *
+ * @param {string} userId - The ID of the user.
+ * @param {string} articleId - The ID of the article.
+ * @returns {Promise<boolean>} A promise that resolves to a boolean indicating the success of the deletion.
+ */
+const deleteById = async (userId, articleId) => {
+  await Like.destroy({ where: { userId, articleId } });
+};
+
+module.exports = { create, checkIfLiked, deleteById };

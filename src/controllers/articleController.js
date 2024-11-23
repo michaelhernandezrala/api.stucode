@@ -115,10 +115,32 @@ const deleteByUserIdAndArticleId = async (req, res) => {
   responseHelper.ok(req, res);
 };
 
+/**
+ * Handler for DELETE /users/{userId}/favorites
+ *
+ * @param {Request} req - The Express request object.
+ * @param {Response} res - The Express response object.
+ */
+const findFavoritesByUserId = async (req, res) => {
+  const { userId } = req.params;
+  const queryParams = req.query;
+
+  const user = await userService.findById(userId, { raw: true });
+  if (!user) {
+    responseHelper.notFound(req, res, errorMessages.USER_NOT_FOUND, errorCodes.USER_NOT_FOUND);
+    return;
+  }
+
+  const filters = { userId, ...queryParams };
+  const response = await articleService.findAndCountAllFavorites(filters, { raw: true });
+  responseHelper.ok(req, res, response.rows, response.count);
+};
+
 module.exports = {
   create,
   findAndCountAll,
   findByUserIdAndArticleId,
   updateByUserIdAndArticleId,
   deleteByUserIdAndArticleId,
+  findFavoritesByUserId,
 };
