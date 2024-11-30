@@ -891,6 +891,180 @@ paths:
         500:
           $ref: '#/components/responses/InternalServerError'
 
+  /users/{userId}/followers:
+    post:
+      tags:
+        - Users 👤
+      summary: Follow a user
+      description: Follow another user by providing the follower and followed user IDs.
+      x-eov-operation-handler: userController
+      operationId: followUser
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: ID of the user being followed
+      requestBody:
+        description: ID of the user who is following
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                followerId:
+                  type: string
+                  format: uuid
+                  description: ID of the user who is following
+              required:
+                - followerId
+      responses:
+        200:
+          $ref: '#/components/responses/Ok'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+    get:
+      tags:
+        - Users 👤
+      summary: List followers of a user
+      description: Retrieve a list of users following the specified user.
+      x-eov-operation-handler: userController
+      operationId: listFollowers
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: ID of the user to retrieve followers for
+        - name: page
+          in: query
+          description: The page number for pagination.
+          required: false
+          schema:
+            type: integer
+            format: int64
+            default: 1
+        - name: limit
+          in: query
+          description: The limit of results per page.
+          required: false
+          schema:
+            type: integer
+            format: int64
+            default: 20
+        - name: find
+          in: query
+          description: A search term to filter results.
+          required: false
+          schema:
+            type: string
+            default: ''
+          allowReserved: true
+        - name: order
+          in: query
+          description: >
+            Order of the results:
+
+              - `a-z` - Order by name ascending. From A to Z
+              - `z-a` - Order by name descending. From Z to A
+          required: false
+          schema:
+            type: string
+            enum:
+              - a-z
+              - z-a
+            default: a-z
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: integer
+                    format: int64
+                    description: HTTP status code indicating a successful operation.
+                    default: 200
+                  message:
+                    type: string
+                    description: Descriptive message of the operation.
+                    default: OK
+                  count:
+                    type: integer
+                    format: int64
+                    description: The total number of users found.
+                    default: 1
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/User'
+                required:
+                  - statusCode
+                  - message
+                  - count
+                  - data
+                additionalProperties: false
+        400:
+          $ref: '#/components/responses/BadRequest'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+
+  /users/{userId}/followers/{followerId}:
+    delete:
+      tags:
+        - Users 👤
+      summary: Unfollow a user
+      description: Unfollow a user by providing the follower and followed user IDs.
+      x-eov-operation-handler: userController
+      operationId: unfollowUser
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: ID of the user being unfollowed
+        - name: followerId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: ID of the user who wants to unfollow
+      responses:
+        200:
+          $ref: '#/components/responses/Ok'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+
 components:
   securitySchemes:
     bearerAuth:

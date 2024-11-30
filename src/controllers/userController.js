@@ -134,4 +134,80 @@ const deleteById = async (req, res) => {
   responseHelper.ok(req, res);
 };
 
-module.exports = { create, login, findAndCountAll, findById, update, deleteById };
+/**
+ * Handler for POST /users/{userId}/followers
+ *
+ * @param {Request} req - The Express request object.
+ * @param {Response} res - The Express response object.
+ */
+const followUser = async (req, res) => {
+  const { userId } = req.params;
+  const payload = req.body;
+
+  const user = await userService.findById(userId, { raw: true });
+  if (!user) {
+    responseHelper.notFound(req, res, errorMessages.USER_NOT_FOUND, errorCodes.USER_NOT_FOUND);
+    return;
+  }
+
+  const follower = await userService.findById(payload.followerId, { raw: true });
+  if (!follower) {
+    responseHelper.notFound(req, res, errorMessages.USER_NOT_FOUND, errorCodes.USER_NOT_FOUND);
+    return;
+  }
+
+  const data = { followedId: userId, followerId: payload.followerId };
+  await userService.createFollow(data);
+  responseHelper.ok(req, res);
+};
+
+/**
+ * Handler for GET /users/{userId}/followers
+ *
+ * @param {Request} req - The Express request object.
+ * @param {Response} res - The Express response object.
+ */
+const listFollowers = async (req, res) => {
+  const queryParams = req.query;
+  const { userId } = req.params;
+
+  const response = await userService.listFollowers(userId, queryParams);
+  responseHelper.ok(req, res, response.rows, response.count);
+};
+
+/**
+ * Handler for DELETE /users/{userId}/followers/{followerId}
+ *
+ * @param {Request} req - The Express request object.
+ * @param {Response} res - The Express response object.
+ */
+const unfollowUser = async (req, res) => {
+  const { userId, followerId } = req.params;
+
+  const user = await userService.findById(userId, { raw: true });
+  if (!user) {
+    responseHelper.notFound(req, res, errorMessages.USER_NOT_FOUND, errorCodes.USER_NOT_FOUND);
+    return;
+  }
+
+  const follower = await userService.findById(followerId, { raw: true });
+  if (!follower) {
+    responseHelper.notFound(req, res, errorMessages.USER_NOT_FOUND, errorCodes.USER_NOT_FOUND);
+    return;
+  }
+
+  await userService.unfollowUser(userId, followerId);
+  responseHelper.ok(req, res);
+};
+
+module.exports = {
+  create,
+  login,
+  findAndCountAll,
+  findById,
+  update,
+  deleteById,
+  followUser,
+  listFollowers,
+  unfollowUser,
+};

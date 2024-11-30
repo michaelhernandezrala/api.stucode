@@ -1,7 +1,7 @@
 const _ = require('lodash');
 const { Op, Sequelize } = require('sequelize');
 
-const { Article, User, Like } = require('../lib/sequelize/models');
+const { Article, User, Like, Follower } = require('../lib/sequelize/models');
 
 /**
  * Registers a new user in the database.
@@ -48,6 +48,10 @@ const findById = async (id, params = null) => {
     subQuery: false,
     ...params,
   });
+
+  if (!user) {
+    return null;
+  }
 
   return {
     ...user,
@@ -155,4 +159,80 @@ const deleteById = async (id) => {
   await User.destroy({ where: { id } });
 };
 
-module.exports = { create, findById, findByEmail, findAndCountAll, update, deleteById };
+/**
+ * Creates a follow relationship between two users.
+ *
+ * @param {object} data - The data containing `followerId` and `followedId`.
+ * @returns {Promise<void>} Resolves when the follow relationship is successfully created.
+ */
+const createFollow = async (data) => {
+  await Follower.create(data);
+};
+
+/**
+ * Retrieves a paginated list of followers for a user based on filters.
+ *
+ * @param {string} userId - The ID of the user whose followers are being retrieved.
+ * @param {object} filters - Filters for querying followers.
+ * @returns {Promise<object>} A promise that resolves to an object containing the count of followers and the paginated list of followers.
+ */
+const listFollowers = async (userId, filters) => {
+  const { page, limit, find, order } = filters;
+  let orderClause = [[{ model: User, as: 'follower' }, 'name', 'ASC']];
+  const offset = (page - 1) * limit;
+  const where = {};
+
+  if (find) {
+    where[Op.or] = [
+      { 'follower.name': { [Op.iLike]: `%${find}%` } },
+      { 'follower.email': { [Op.iLike]: `%${find}%` } },
+    ];
+  }
+
+  if (order === 'z-a') {
+    orderClause = [[{ model: User, as: 'follower' }, 'name', 'DESC']];
+  }
+
+  const { count, rows } = await Follower.findAndCountAll({
+    where: { followedId: userId },
+    include: [
+      {
+        model: User,
+        as: 'follower',
+        where,
+        attributes: { exclude: ['password'] },
+      },
+    ],
+    order: orderClause,
+    offset,
+    limit,
+    raw: true,
+    nest: true,
+  });
+
+  const users = rows.map((row) => row.follower) ?? [];
+  return { count, rows: users };
+};
+
+/**
+ * Removes a follow relationship between two users.
+ *
+ * @param {string} followedId - The ID of the user being unfollowed.
+ * @param {string} followerId - The ID of the user who wants to unfollow.
+ * @returns {Promise<void>} A promise that resolves when the follow relationship is successfully removed.
+ */
+const unfollowUser = async (followedId, followerId) => {
+  await Follower.destroy({ where: { followedId, followerId } });
+};
+
+module.exports = {
+  create,
+  findById,
+  findByEmail,
+  findAndCountAll,
+  update,
+  deleteById,
+  createFollow,
+  listFollowers,
+  unfollowUser,
+};
