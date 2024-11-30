@@ -36,12 +36,18 @@ const findById = async (id, params = null) => {
         attributes: [],
         required: false,
       },
+      {
+        model: Follower,
+        attributes: [],
+        required: false,
+      },
     ],
     attributes: {
       exclude: ['password'],
       include: [
         [Sequelize.fn('COUNT', Sequelize.literal('DISTINCT "Likes"."article_id"')), 'favorites'],
         [Sequelize.fn('COUNT', Sequelize.col('Articles.id')), 'articles'],
+        [Sequelize.fn('COUNT', Sequelize.literal('DISTINCT "Followers"."followed_id"')), 'followers'],
       ],
     },
     group: ['User.id'],
@@ -57,6 +63,7 @@ const findById = async (id, params = null) => {
     ...user,
     articles: parseInt(user.articles, 10) ?? 0,
     favorites: parseInt(user.favorites, 10) ?? 0,
+    followers: parseInt(user.followers, 10) ?? 0,
   };
 };
 
@@ -110,12 +117,18 @@ const findAndCountAll = async (filters, params = null) => {
         attributes: [],
         required: false,
       },
+      {
+        model: Follower,
+        attributes: [],
+        required: false,
+      },
     ],
     attributes: {
       exclude: ['password'],
       include: [
         [Sequelize.fn('COUNT', Sequelize.literal('DISTINCT "Likes"."article_id"')), 'favorites'],
         [Sequelize.fn('COUNT', Sequelize.col('Articles.id')), 'articles'],
+        [Sequelize.fn('COUNT', Sequelize.literal('DISTINCT "Followers"."followed_id"')), 'followers'],
       ],
     },
     group: ['User.id'],
@@ -131,6 +144,7 @@ const findAndCountAll = async (filters, params = null) => {
     ...user,
     articles: parseInt(user.articles, 10) ?? 0,
     favorites: parseInt(user.favorites, 10) ?? 0,
+    followers: parseInt(user.followers, 10) ?? 0,
   }));
 
   return { rows: users, count };
