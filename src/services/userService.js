@@ -197,10 +197,7 @@ const listFollowers = async (userId, filters) => {
   const where = {};
 
   if (find) {
-    where[Op.or] = [
-      { 'follower.name': { [Op.iLike]: `%${find}%` } },
-      { 'follower.email': { [Op.iLike]: `%${find}%` } },
-    ];
+    where[Op.or] = [{ name: { [Op.iLike]: `%${find}%` } }, { email: { [Op.iLike]: `%${find}%` } }];
   }
 
   if (order === 'z-a') {
