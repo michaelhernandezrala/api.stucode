@@ -8,6 +8,12 @@ module.exports = {
     host: config.get('database.host'),
     dialect: config.get('database.dialect'),
     logging: false,
+    dialectOptions: {
+      ssl: {
+        require: true,
+        rejectUnauthorized: false,
+      },
+    },
   },
   test: {
     username: config.get('database.username'),
@@ -16,6 +22,12 @@ module.exports = {
     host: config.get('database.host'),
     dialect: config.get('database.dialect'),
     logging: false,
+    dialectOptions: {
+      ssl: {
+        require: true,
+        rejectUnauthorized: false,
+      },
+    },
   },
   production: {
     username: config.get('database.username'),
@@ -24,5 +36,11 @@ module.exports = {
     host: config.get('database.host'),
     dialect: config.get('database.dialect'),
     logging: false,
+    dialectOptions: {
+      ssl: {
+        require: true,
+        rejectUnauthorized: false,
+      },
+    },
   },
 };
